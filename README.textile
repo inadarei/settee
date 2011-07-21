@@ -1,4 +1,4 @@
-Inspired by: "CouchRest by Chris Anderson":http://jchrisa.net/drl/_design/sofa/_list/post/post-page?startkey=%5B%22couchrest__restful_ruby_client_%22%5D
+Inspired by: "CouchRest library for Ruby":http://jchrisa.net/drl/_design/sofa/_list/post/post-page?startkey=%5B%22couchrest__restful_ruby_client_%22%5D
 
 h3. Server Functions
 
