@@ -27,21 +27,21 @@ class settee_server {
   /**
   * Create database
   */
-  function create_database($dbname) {
+  function create_db($dbname) {
     return $this->rest_client->put($dbname);  
   }
   
   /**
   * Drop database
   */
-  function drop_database($dbname) {
+  function drop_db($dbname) {
     return $this->rest_client->delete($dbname);  
   }
   
   /**
   * Return a database object
   */
-  function get_database($dbname) {
+  function get_db($dbname) {
     return new settee_database($conn_url, $dbname);
   }
 
@@ -49,7 +49,7 @@ class settee_server {
   /**
   * Return a database object
   */
-  function list_databases() {
+  function list_dbs() {
     $resp = $this->rest_client->get('_all_dbs');   
     $resp = json_decode($resp, true);
     print_r($resp);
