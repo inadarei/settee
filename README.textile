@@ -1,1 +1,12 @@
-Inspired by: http://jchrisa.net/drl/_design/sofa/_list/post/post-page?startkey=%5B%22couchrest__restful_ruby_client_%22%5D
+Inspired by: "CouchRest by Chris Anderson":http://jchrisa.net/drl/_design/sofa/_list/post/post-page?startkey=%5B%22couchrest__restful_ruby_client_%22%5D
+
+h3. Server Functions
+
+# Specify a server: 
+@$server = new settee_server('http://10.0.1.21:5984');@ 
+# Create a database:
+@$ret = $server->create_database('irakli_test');@ 
+# Drop a database:
+@$ret = $server->drop_database('irakli_test');@ 
+# List all databases:
+@$ret = $server->list_databases();@
