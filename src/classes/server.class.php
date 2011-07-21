@@ -3,12 +3,12 @@
 /**
 * CouchDB Server Manager
 */
-class settee_server {
+class SetteeServer {
 
   /**
   * Base URL of the CouchDB REST API
   */
-  protected $conn_url;
+  private $conn_url;
   
   /**
   * HTTP REST Client instance
@@ -21,39 +21,78 @@ class settee_server {
   */
   function __construct($conn_url) {
     $this->conn_url = $conn_url;
-    $this->rest_client = settee_restclient::get_instance($this->conn_url);
+    $this->rest_client = SetteeRestClient::get_instance($this->conn_url);
   }
   
   /**
   * Create database
+  * @param $db
+  *     String name of the database.
+  *
+  * @return
+  *     json string from the server.
+  *
+  *  @throws SetteeCreateDatabaseException
   */
   function create_db($dbname) {
-    return $this->rest_client->http_put($dbname);  
+    $ret = $this->rest_client->http_put($dbname);
+    $ret_decoded = json_decode($ret, true);
+    if (!empty($ret_decoded["error"])) {
+      throw new SetteeCreateDatabaseException("Could not create database: " . $ret);
+    }
+    return $ret_decoded;
   }
   
   /**
   * Drop database
+  *
+  * @param $db
+  *     Either a database object or a String name of the database.
+  *
+  * @return
+  *     json string from the server.
+  *
+  *  @throws SetteeDropDatabaseException
   */
-  function drop_db($dbname) {
-    return $this->rest_client->http_delete($dbname);  
+  function drop_db($db) {
+    if ($db instanceof SetteeDatabase) {
+      $db = $db->get_name();
+    }
+    $ret =  $this->rest_client->http_delete($db);
+    $ret_decoded = json_decode($ret, true);
+    if (!empty($ret_decoded["error"])) {
+      throw new SetteeDropDatabaseException("Could not drop database: " . $ret);
+    }
+    return $ret_decoded;
   }
   
   /**
-  * Return a database object
+  * Instantiate a database object
+  *
+  * @param $dbname
+  *    name of the newly created database
+  *
+  * @return SetteeDatabase
+  *     new SetteeDatabase instance.
   */
   function get_db($dbname) {
-    return new settee_database($conn_url, $dbname);
+    return new SetteeDatabase($conn_url, $dbname);
   }
 
 
   /**
-  * Return a database object
+  * Return an array containing all databases
+  *
+  * @return Array
+  *    an array of database names in the CouchDB instance
   */
   function list_dbs() {
     $resp = $this->rest_client->http_get('_all_dbs');   
-    $resp = json_decode($resp, true);
-    print_r($resp);
+    $list = json_decode($resp, true);
+    return $list;
   }
 
-
 }
+
+class SetteeDropDatabaseException extends Exception {}
+class SetteeCreateDatabaseException extends Exception {}

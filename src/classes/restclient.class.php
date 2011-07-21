@@ -3,15 +3,15 @@
 /**
 * HTTP REST Client for CouchDB API
 */
-class settee_restclient {
+class SetteeRestClient {
   
   /**
   * HTTP Timeout in Milliseconds
   */
   const HTTP_TIMEOUT = 2000;
   
-  protected $base_url;
-  protected $curl;
+  private $base_url;
+  private $curl;
   
   private static $curl_workers = array();
   
@@ -19,8 +19,9 @@ class settee_restclient {
   * Singleton factory method   
   */
   function get_instance($base_url) {
+
     if (empty($curl_workers[$base_url])) {
-      $curl_workers[$base_url] = new settee_restclient($base_url);
+      $curl_workers[$base_url] = new SetteeRestClient($base_url);
     }
     
     return $curl_workers[$base_url];

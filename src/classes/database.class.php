@@ -3,12 +3,12 @@
 /**
 * Databaase class.
 */
-class  settee_database {
+class SetteeDatabase {
 
   /**
   * Base URL of the CouchDB REST API
   */
-  protected $conn_url;
+  private $conn_url;
   
   /**
   * HTTP REST Client instance
@@ -18,7 +18,7 @@ class  settee_database {
   /**
   * Name of the database
   */
-  protected $dbname;
+  private $dbname;
   
   /**
   * Default constructor
@@ -45,6 +45,11 @@ class  settee_database {
   * Delete a document
   */  
   function delete() {
+  }
+  
+  /** Getter for database name */
+  function get_name() {
+    return $this->name;
   }
    
 }
