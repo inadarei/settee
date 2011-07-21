@@ -3,7 +3,7 @@ Inspired by: "CouchRest library for Ruby":http://jchrisa.net/drl/_design/sofa/_l
 h3. Server Functions
 
 # Specify a server: 
-@$server = new settee_server('http://10.0.1.21:5984');@ 
+@$server = settee_restclient::get_instance('http://10.0.1.21:5984');@ 
 # Create a database:
 @$ret = $server->create_db('irakli_test');@ 
 # Drop a database:

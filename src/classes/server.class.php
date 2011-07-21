@@ -21,21 +21,21 @@ class settee_server {
   */
   function __construct($conn_url) {
     $this->conn_url = $conn_url;
-    $this->rest_client = new settee_restclient($this->conn_url);
+    $this->rest_client = settee_restclient::get_instance($this->conn_url);
   }
   
   /**
   * Create database
   */
   function create_db($dbname) {
-    return $this->rest_client->put($dbname);  
+    return $this->rest_client->http_put($dbname);  
   }
   
   /**
   * Drop database
   */
   function drop_db($dbname) {
-    return $this->rest_client->delete($dbname);  
+    return $this->rest_client->http_delete($dbname);  
   }
   
   /**
@@ -50,7 +50,7 @@ class settee_server {
   * Return a database object
   */
   function list_dbs() {
-    $resp = $this->rest_client->get('_all_dbs');   
+    $resp = $this->rest_client->http_get('_all_dbs');   
     $resp = json_decode($resp, true);
     print_r($resp);
   }

@@ -13,10 +13,23 @@ class settee_restclient {
   protected $base_url;
   protected $curl;
   
+  private static $curl_workers = array();
+  
+  /**
+  * Singleton factory method   
+  */
+  function get_instance($base_url) {
+    if (empty($curl_workers[$base_url])) {
+      $curl_workers[$base_url] = new settee_restclient($base_url);
+    }
+    
+    return $curl_workers[$base_url];
+  }
+  
   /**
   * Class constructor
   */
-  function __construct($base_url) {
+  private function __construct($base_url) {
     $this->base_url = $base_url;
 
     $curl = curl_init();
@@ -24,6 +37,7 @@ class settee_restclient {
     curl_setopt($curl, CURLOPT_HEADER, 0);    
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt($curl, CURLOPT_TIMEOUT_MS, self::HTTP_TIMEOUT);
+    curl_setopt($curl, CURLOPT_FORBID_REUSE, false); // Connection-pool for CURL
 
     $this->curl = $curl;
     
@@ -32,7 +46,7 @@ class settee_restclient {
   /**
   * HTTP GET
   */
-  function get($uri, $data = array()) {
+  function http_get($uri, $data = array()) {
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));    
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "GET"); 
     return $response = curl_exec($this->curl);    
@@ -41,7 +55,7 @@ class settee_restclient {
   /**
   * HTTP PUT
   */
-  function put($uri, $data = array()) {
+  function http_put($uri, $data = array()) {
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));    
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "PUT"); 
     return $response = curl_exec($this->curl);    
@@ -50,7 +64,7 @@ class settee_restclient {
   /**
   * HTTP DELETE
   */
-  function delete($uri, $data = array()) {
+  function http_delete($uri, $data = array()) {
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "DELETE");
     return $response = curl_exec($this->curl);
@@ -60,6 +74,7 @@ class settee_restclient {
   * Get full URL from partial one
   */
   private function get_full_url($uri) {
+    $uri = rawurlencode($uri);    
     return $this->base_url . '/' . $uri;
   }
 }
