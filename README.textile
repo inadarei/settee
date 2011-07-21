@@ -5,8 +5,10 @@ h3. Server Functions
 # Specify a server: 
 @$server = new settee_server('http://10.0.1.21:5984');@ 
 # Create a database:
-@$ret = $server->create_database('irakli_test');@ 
+@$ret = $server->create_db('irakli_test');@ 
 # Drop a database:
-@$ret = $server->drop_database('irakli_test');@ 
+@$ret = $server->drop_db('irakli_test');@ 
 # List all databases:
-@$ret = $server->list_databases();@
+@$ret = $server->list_dbs();@
+# Get a database object
+@$ret = $server->get_db('irakli_test');@
