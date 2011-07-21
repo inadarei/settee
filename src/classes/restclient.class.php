@@ -5,6 +5,11 @@
 */
 class settee_restclient {
   
+  /**
+  * HTTP Timeout in Milliseconds
+  */
+  const HTTP_TIMEOUT = 2000;
+  
   protected $base_url;
   protected $curl;
   
@@ -18,16 +23,28 @@ class settee_restclient {
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_HEADER, 0);    
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl, CURLOPT_TIMEOUT_MS, self::HTTP_TIMEOUT);
 
     $this->curl = $curl;
     
   }
   
   /**
+  * HTTP GET
+  */
+  function get($uri, $data = array()) {
+    curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));    
+    curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "GET"); 
+    return $response = curl_exec($this->curl);    
+  }  
+  
+  /**
   * HTTP PUT
   */
   function put($uri, $data = array()) {
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));    
+    curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "PUT"); 
+    return $response = curl_exec($this->curl);    
   }
 
   /**
@@ -36,11 +53,7 @@ class settee_restclient {
   function delete($uri, $data = array()) {
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-    var_dump($this->curl);
-    $response = curl_exec($this->curl);
-    
-    var_dump($response);
-    return $response;
+    return $response = curl_exec($this->curl);
   }
   
   /**

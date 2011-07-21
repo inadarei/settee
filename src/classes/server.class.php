@@ -28,6 +28,7 @@ class settee_server {
   * Create database
   */
   function create_database($dbname) {
+    return $this->rest_client->put($dbname);  
   }
   
   /**
@@ -42,6 +43,16 @@ class settee_server {
   */
   function get_database($dbname) {
     return new settee_database($conn_url, $dbname);
+  }
+
+
+  /**
+  * Return a database object
+  */
+  function list_databases() {
+    $resp = $this->rest_client->get('_all_dbs');   
+    $resp = json_decode($resp, true);
+    print_r($resp);
   }
 
 
