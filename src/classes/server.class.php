@@ -76,7 +76,7 @@ class SetteeServer {
   *     new SetteeDatabase instance.
   */
   function get_db($dbname) {
-    return new SetteeDatabase($conn_url, $dbname);
+    return new SetteeDatabase($this->conn_url, $dbname);
   }
 
 
