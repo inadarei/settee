@@ -3,12 +3,16 @@ Inspired by: "CouchRest library for Ruby":http://jchrisa.net/drl/_design/sofa/_l
 h3. Server Functions
 
 # Specify a server: 
-@$server = SetteeRestClient::get_instance('http://10.0.1.21:5984');@ 
-# Create a database:
+@$server = SetteeRestClient::get_instance('http://10.0.1.21:5984');@
+# Database API
+## Create a database:
 @$ret = $server->create_db('irakli_test');@ 
-# Drop a database:
+## Drop a database:
 @$ret = $server->drop_db('irakli_test');@ 
-# List all databases:
+## List all databases:
 @$ret = $server->list_dbs();@
-# Get a database object
-@$ret = $server->get_db('irakli_test');@
+## Get a database object
+@$db = $server->get_db('irakli_test');@
+# Document API
+## Create a document:
+@$ret = $db->create($doc);@
