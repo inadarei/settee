@@ -39,11 +39,7 @@ class SetteeDatabase {
   */
   function gen_uuid() {
     $ret = $this->rest_client->http_get('_uuids');
-    $ret_decoded = json_decode($ret, true);
-    if (!empty($ret_decoded["error"])) {
-      throw new SetteeServerErrorException("CouchDB Error: " . $ret);
-    }
-    return $ret_decoded['uuids'][0]; // should never be empty at this point, so no checking
+    return $ret['decoded']['uuids'][0]; // should never be empty at this point, so no checking
   }
 
   /**
@@ -67,11 +63,7 @@ class SetteeDatabase {
     $full_uri = $this->dbname . "/$uuid";
 
     $ret = $this->rest_client->http_put($full_uri, $document);
-    $ret_decoded = json_decode($ret, true);
-    if (!empty($ret_decoded["error"])) {
-      throw new SetteeCreateDocumentException("Could not create document: " . $ret);
-    }
-    return $ret_decoded['rev'];
+    return $ret['decoded']['rev'];
   }
 
   /**
@@ -98,8 +90,3 @@ class SetteeDatabase {
   }
    
 }
-
-class SetteeCreateDocumentException extends Exception {}
-class SetteeSaveDocumentException extends Exception {}
-class SetteeDeleteDocumentException extends Exception {}
-class SetteeLoadDocumentException extends Exception {}
