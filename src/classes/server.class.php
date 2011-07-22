@@ -20,7 +20,7 @@ class SetteeServer {
   * Class constructor
   */
   function __construct($conn_url) {
-    $this->conn_url = $conn_url;
+    $this->conn_url = rtrim($conn_url, ' /');
     $this->rest_client = SetteeRestClient::get_instance($this->conn_url);
   }
   
@@ -40,11 +40,10 @@ class SetteeServer {
       $db = $db->get_name();
     }
     $ret = $this->rest_client->http_put($db);
-    $ret_decoded = json_decode($ret, true);
-    if (!empty($ret_decoded["error"])) {
-      throw new SetteeCreateDatabaseException("Could not create database: " . $ret);
+    if (!empty($ret['decoded']["error"])) {
+      throw new SetteeDatabaseException("Could not create database: " . $ret["json"]);
     }
-    return $ret_decoded;
+    return $ret['decoded'];
   }
   
   /**
@@ -63,11 +62,10 @@ class SetteeServer {
       $db = $db->get_name();
     }
     $ret =  $this->rest_client->http_delete($db);
-    $ret_decoded = json_decode($ret, true);
-    if (!empty($ret_decoded["error"])) {
-      throw new SetteeDropDatabaseException("Could not drop database: " . $ret);
+    if (!empty($ret['decoded']["error"])) {
+      throw new SetteeDatabaseException("Could not create database: " . $ret["json"]);
     }
-    return $ret_decoded;
+    return $ret['decoded'];
   }
   
   /**
@@ -91,13 +89,14 @@ class SetteeServer {
   *    an array of database names in the CouchDB instance
   */
   function list_dbs() {
-    $resp = $this->rest_client->http_get('_all_dbs');   
-    $list = json_decode($resp, true);
-    return $list;
+    $ret = $this->rest_client->http_get('_all_dbs');
+    if (!empty($ret['decoded']["error"])) {
+      throw new SetteeDatabaseException("Could not get list of databases: " . $ret["json"]);
+    }
+    return $ret['decoded'];
   }
 
 }
 
 class SetteeServerErrorException extends Exception {}
-class SetteeDropDatabaseException extends Exception {}
-class SetteeCreateDatabaseException extends Exception {}
+class SetteeDatabaseException extends Exception {}
