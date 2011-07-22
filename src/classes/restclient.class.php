@@ -36,9 +36,9 @@ class SetteeRestClient {
     $this->base_url = $base_url;
 
     $curl = curl_init();
+    curl_setopt($curl, CURLOPT_USERAGENT, "Settee CouchDB Client");
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_HEADER, 0);
-    curl_setopt($curl, CURLOPT_HEADERFUNCTION, array($this, '_return_header_check'));
     curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt($curl, CURLOPT_TIMEOUT_MS, self::HTTP_TIMEOUT);
     curl_setopt($curl, CURLOPT_FORBID_REUSE, false); // Connection-pool for CURL
@@ -58,10 +58,22 @@ class SetteeRestClient {
   * HTTP GET
   */
   function http_get($uri, $data = array()) {
-    curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));    
+    $data = (is_array($data)) ? http_build_query($data) : urlencode(trim($data));
+    $url = $this->get_full_url($uri);
+    if (!empty($data)) {
+      $url .= "?$data";
+    }
+    curl_setopt($this->curl, CURLOPT_URL, $url);
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "GET");
+    //curl_setopt($this->curl, CURLOPT_HTTPGET, true);
+
     $this->http_response_headers = array();
     $response = curl_exec($this->curl);
+
+    $err = curl_error($this->curl);
+    if (!empty($err)) {
+      throw SetteeServerException("$err");
+    }
     try {
       $this->check_status();
     } catch (SetteeRestClientException $e) {
@@ -75,6 +87,11 @@ class SetteeRestClient {
   */
   function http_put($uri, $data = array()) {
     $data = (is_array($data)) ? http_build_query($data) : $data;
+
+    if (empty($data)) {
+      curl_setopt($this->curl, CURLOPT_HEADERFUNCTION, array($this, '_return_header_check'));
+    }
+    curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
     curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Length: ' . strlen($data)));
     curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
 
@@ -94,6 +111,8 @@ class SetteeRestClient {
   * HTTP DELETE
   */
   function http_delete($uri, $data = array()) {
+
+    curl_setopt($this->curl, CURLOPT_HEADERFUNCTION, array($this, '_return_header_check'));
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, "DELETE");
     $this->http_response_headers = array();
@@ -145,7 +164,8 @@ class SetteeRestClient {
   * Get full URL from partial one
   */
   private function get_full_url($uri) {
-    $uri = rawurlencode($uri);    
+    // We do not want "/" separators to be encoded!!!
+    $uri = str_replace('%2F', '/', rawurlencode($uri));
     return $this->base_url . '/' . $uri;
   }
 }

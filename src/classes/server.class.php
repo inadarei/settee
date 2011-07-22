@@ -26,16 +26,20 @@ class SetteeServer {
   
   /**
   * Create database
+  *
   * @param $db
-  *     String name of the database.
+  *     Either a database object or a String name of the database.
   *
   * @return
   *     json string from the server.
   *
   *  @throws SetteeCreateDatabaseException
   */
-  function create_db($dbname) {
-    $ret = $this->rest_client->http_put($dbname);
+  function create_db($db) {
+    if ($db instanceof SetteeDatabase) {
+      $db = $db->get_name();
+    }
+    $ret = $this->rest_client->http_put($db);
     $ret_decoded = json_decode($ret, true);
     if (!empty($ret_decoded["error"])) {
       throw new SetteeCreateDatabaseException("Could not create database: " . $ret);
@@ -94,5 +98,6 @@ class SetteeServer {
 
 }
 
+class SetteeServerErrorException extends Exception {}
 class SetteeDropDatabaseException extends Exception {}
 class SetteeCreateDatabaseException extends Exception {}
