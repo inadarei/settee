@@ -1,0 +1,3 @@
+Copyright © 2011. Irakli Nadareishvili
+
+Settee code is licensed under GPL v3. (http://www.gnu.org/copyleft/gpl.html).
