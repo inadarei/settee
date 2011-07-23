@@ -124,14 +124,15 @@ class SetteeRestClient {
 
   /**
    * @param  $path
+   *    Full path to a file (e.g. as returned by PHP's realpath function).
    * @return void
    */
-  public function file_type ($path)  {
+  public function file_mime_type ($path)  {
     $ftype = 'application/octet-stream';
     
     if (function_exists("finfo_file")) {
-      $finfo = @new finfo(FILEINFO_MIME);
-      $fres = @$finfo->file($path);
+      $finfo = new finfo(FILEINFO_MIME_TYPE | FILEINFO_SYMLINK);
+      $fres = $finfo->file($path);
       if (is_string($fres) && !empty($fres)) {
          $ftype = $fres;
       }

@@ -27,11 +27,11 @@ class SetteeDatabaseTest extends SetteeTestCase {
 
     $_rev = $doc->_rev;
     $doc = $this->db->get($doc->_id);
-    $this->assertEquals($doc->_rev, $_rev, "Document retrieval success [object-based] test");
+    $this->assertEquals($_rev, $doc->_rev, "Document retrieval success [object-based] test");
 
     $doc->firstName = "Ika";
     $db_doc = $this->db->save($doc);
-    $this->assertEquals($db_doc->firstName, $doc->firstName, "Document update success [object-based]");
+    $this->assertEquals($doc->firstName, $db_doc->firstName, "Document update success [object-based]");
 
     $this->db->delete($doc);
 
@@ -58,7 +58,7 @@ class SetteeDatabaseTest extends SetteeTestCase {
 
     $_rev = $doc->_rev;
     $db_doc = $this->db->get($doc->_id);
-    $this->assertEquals($db_doc->_rev, $_rev, "Document retrieval success [json-based] test");
+    $this->assertEquals($_rev, $db_doc->_rev, "Document retrieval success [json-based] test");
 
     $doc = '{';
     $doc .= '"_id":"' . $db_doc->_id . '",';
@@ -67,7 +67,7 @@ class SetteeDatabaseTest extends SetteeTestCase {
     
     $orig_doc = json_decode($doc);
     $db_doc = $this->db->save($doc);
-    $this->assertEquals($db_doc->firstName, $orig_doc->firstName, "Document update success [json-based]");
+    $this->assertEquals($orig_doc->firstName, $db_doc->firstName, "Document update success [json-based]");
 
     $doc = '{';
     $doc .= '"_id":"' . $db_doc->_id . '",';

@@ -28,17 +28,37 @@ class SetteeRestClientTest extends SetteeTestCase {
     $calc = $get_full_url_method->invokeArgs($this->rest_client, array($uri));
     //--
     $expected = $this->db_url . '/irakli/26cede9ab9cd8fcd67895eb05200d1ea';
-    $this->assertEquals($calc, $expected, "Full URL Generation with DB and ID");
+    $this->assertEquals($expected, $calc, "Full URL Generation with DB and ID");
 
     $uri = 'irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267';
     $calc = $get_full_url_method->invokeArgs($this->rest_client, array($uri));
     $expected = $this->db_url . '/irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267';
-    $this->assertEquals($calc, $expected, "Full URL Generation with DB, ID and Single Query Parameter");
+    $this->assertEquals($expected, $calc, "Full URL Generation with DB, ID and Single Query Parameter");
     
     $uri = 'irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267&second=foo';
     $calc = $get_full_url_method->invokeArgs($this->rest_client, array($uri));
     $expected = $this->db_url . '/irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267&second=foo';
-    $this->assertEquals($calc, $expected, "Full URL Generation with DB, ID and Two Query Parameters");
+    $this->assertEquals($expected, $calc, "Full URL Generation with DB, ID and Two Query Parameters");
+
+  }
+
+  public function test_file_mime_type() {
+
+    $type = $this->rest_client->file_mime_type(dirname(__FILE__) . "/resources/couch-logo.jpg");
+    $this->assertEquals("image/jpeg", $type, "Jpeg Mime Type Detection");
+
+    $type = $this->rest_client->file_mime_type(dirname(__FILE__) . "/resources/couch-logo.pdf");
+    $this->assertEquals("application/pdf", $type, "PDF Mime Type Detection");
+
+
+    $type = $this->rest_client->file_mime_type(dirname(__FILE__) . "/resources/couch-logo.png");
+    $this->assertEquals("image/png", $type, "PNG Mime Type Detection");
+
+    $type = $this->rest_client->file_mime_type(dirname(__FILE__) . "/resources/couch-tag.ini");
+    $this->assertEquals("text/plain", $type, "Text Mime Type Detection");
+
+    $type = $this->rest_client->file_mime_type(dirname(__FILE__) . "/resources/couch-tag.xml");
+    $this->assertEquals("application/xml", $type, "XML Mime Type Detection");
 
   }
 
