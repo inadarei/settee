@@ -21,9 +21,13 @@ $doc->IQ = 200;
 $doc->hobbies = array("skiing", "swimming");
 $doc->pets = array ("whitey" => "labrador", "mikey" => "pug");
 
-$rev = $db->create($doc);
+// Should work with json string as well:
+//$doc = '{"firstName":"irakli","lastName":"Nadareishvili","IQ":200,"hobbies":["skiing","swimming"],"pets":{"whitey":"labrador","mikey":"pug"}}';
 
-print_r($rev . "\n");
+$doc = $db->create($doc);
+
+$db_doc = $db->get($doc->id);
+print_r($db_doc);
 
 
 
