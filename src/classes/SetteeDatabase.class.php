@@ -80,7 +80,7 @@ class SetteeDatabase {
       $id = $document->_id;
     }
 
-    $full_uri = $this->dbname . "/$id";
+    $full_uri = $this->dbname . "/" . urlencode($id);
 
     $ret = $this->rest_client->http_put($full_uri, $document_json);
     if (!is_object($document)) {
@@ -104,7 +104,8 @@ class SetteeDatabase {
       throw new SetteeWrongInputException("Error: Can't retrieve a document without a uuid.");
     }
 
-    $full_uri = $this->dbname . "/$id";
+    $id = urldecode($id);
+    $full_uri = $this->dbname . "/" . urlencode($id);
 
     $ret = $this->rest_client->http_get($full_uri);
     return $ret['decoded'];
@@ -123,7 +124,7 @@ class SetteeDatabase {
       $document = json_decode($document);
     }
 
-    $full_uri = $this->dbname . "/" . $document->_id . "?rev=" . $document->_rev;
+    $full_uri = $this->dbname . "/" . urlencode($document->_id) . "?rev=" . $document->_rev;
     $this->rest_client->http_delete($full_uri);
   }
   

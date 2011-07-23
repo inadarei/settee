@@ -86,6 +86,33 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $this->fail('Document still available for retrieval after being deleted. [object-based]');
   }
 
+  public function test_inline_attachment_json() {
+    $doc = '{
+              "_id":"attachment_doc",
+              "_attachments":
+              {
+                "foo.txt":
+                {
+                  "content_type":"text\/plain",
+                  "data": "VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHRleHQ="
+                }
+              }
+            }';
+    $db_doc = $this->db->save($doc);
+    $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment save successful [json-based]");
+  }
+
+  public function test_inline_attachment_obj() {
+    $doc = new stdClass();
+    $doc->_id = "attachment_doc";
+    $doc->_attachments = new stdClass();
+    $doc->_attachments->foo = new stdClass();
+    $doc->_attachments->foo->content_type = "text/plain";
+    $doc->_attachments->foo->data = "VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHRleHQ=";
+    $db_doc = $this->db->save($doc);
+    $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment save successful [object-based]");
+  }
+
   public function tearDown() {
     $ret = $this->server->drop_db($this->db);
   }
