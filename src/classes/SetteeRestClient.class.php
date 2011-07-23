@@ -99,6 +99,9 @@ class SetteeRestClient {
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $http_method);
 
+
+      print ("\n   ####  " . $this->get_full_url($uri) . "\n");
+    
     $response = curl_exec($this->curl);
     $response_decoded = $this->decode_response($response);
     $response = array('json' => $response, 'decoded'=>$response_decoded);
@@ -135,11 +138,11 @@ class SetteeRestClient {
   }
 
   /**
-  * Get full URL from partial one
+  * Get full URL from a partial one
   */
   private function get_full_url($uri) {
-    // We do not want "/" separators to be encoded!!!
-    $uri = str_replace('%2F', '/', rawurlencode($uri));
+    // We do not want "/", "?", "&" and "=" separators to be encoded!!!
+    $uri = str_replace(array('%2F', '%3F', '%3D', '%26'), array('/', '?', '=', '&'), urlencode($uri));
     return $this->base_url . '/' . $uri;
   }
 }

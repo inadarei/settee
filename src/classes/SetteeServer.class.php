@@ -100,3 +100,4 @@ class SetteeServer {
 
 class SetteeServerErrorException extends Exception {}
 class SetteeDatabaseException extends Exception {}
+class SetteeWrongInputException extends Exception {}
