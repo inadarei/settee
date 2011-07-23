@@ -15,7 +15,7 @@ try {
 }
 
 $doc = new StdClass();
-$doc->firstName = "irakli";
+$doc->firstName = "Irakli";
 $doc->lastName = "Nadareishvili";
 $doc->IQ = 200;
 $doc->hobbies = array("skiing", "swimming");
@@ -24,13 +24,16 @@ $doc->pets = array ("whitey" => "labrador", "mikey" => "pug");
 // Should work with json string as well:
 //$doc = '{"firstName":"irakli","lastName":"Nadareishvili","IQ":200,"hobbies":["skiing","swimming"],"pets":{"whitey":"labrador","mikey":"pug"}}';
 
-$doc = $db->create($doc);
+$doc = $db->save($doc);
+print_r($doc);
 
-$db_doc = $db->get($doc->_id);
-print_r($db_doc);
+$doc = $db->get($doc->_id);
+print_r($doc);
+
+$doc->firstName = "Ika";
+$doc = $db->save($doc);
+print_r($doc);
 
 $db->delete($doc);
-
-echo "\n" . urlencode ("&");
 
 

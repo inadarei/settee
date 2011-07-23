@@ -39,33 +39,45 @@ class SetteeDatabase {
   */
   function gen_uuid() {
     $ret = $this->rest_client->http_get('_uuids');
-    return $ret['decoded']['uuids'][0]; // should never be empty at this point, so no checking
+    return $ret['decoded']->uuids[0]; // should never be empty at this point, so no checking
   }
 
   /**
-  * Create database
+  * Create or update a document database
   *
   * @param $document
   *     PHP object or a JSON String representing the document to be saved. PHP Objects are JSON-encoded automatically.
   *
-  * @param $id
-  *    you can supply your own UUID, if you do not want CouchDB to generate one for you.
+  * <p>If $document has a an "_id" property set, it will be used as document's unique id (even for "create" operation).
+  * If "_id" is missing, CouchDB will be used to generate a UUID.
+  *
+  * <p>If $document has a "_rev" property (revision), document will be updated, rather than creating a new document.
+  * You have to provide "_rev" if you want to update an existing document, otherwise operation will be assumed to be
+  * one of creation and you will get a duplicate document exception from CouchDB. Also, you may not provide "_rev" but
+  * not provide "_id" since that is an invalid input.
   *
   * @return
   *     document object with the database id (uuid) and revision attached;
   *
   *  @throws SetteeCreateDatabaseException
   */
-  function create($document, $id = null) {
+  function save($document) {
     if (is_object($document) || is_array($document)) {
       $document_json = json_encode($document, JSON_NUMERIC_CHECK);
     }
     else {
       $document_json = $document;
+      $document = json_decode($document);
     }
 
-    if (empty($id)) {
+    if (empty($document->_id) && empty($document->_rev)) {
       $id = $this->gen_uuid();
+    }
+    elseif (empty($document->_id) && !empty($document->_rev)) {
+      throw new SetteeWrongInputException("Error: You can not save a document with a revision provided, but missing id");
+    }
+    else {
+      $id = $document->_id;
     }
 
     $full_uri = $this->dbname . "/$id";
@@ -74,17 +86,12 @@ class SetteeDatabase {
     if (!is_object($document)) {
       $document = json_decode($document);
     }
-    $document->_id = $ret['decoded']['id'];
-    $document->_rev = $ret['decoded']['rev'];
+    $document->_id = $ret['decoded']->id;
+    $document->_rev = $ret['decoded']->rev;
+
     return $document;
   }
 
-  /**
-  * Save a document
-  */
-  function save() {
-  }
-  
   /**
    * @throws SetteeWrongInputException
    * @param  $id
@@ -107,13 +114,16 @@ class SetteeDatabase {
   * Delete a document
   *
   * @param $document
-  *    a PHP object that has _id and _rev fields.
+  *    a PHP object or JSON representation of the document that has _id and _rev fields.
   *
   * @return void 
   */  
   function delete($document) {
+    if (!is_object($document)) {
+      $document = json_decode($document);
+    }
+
     $full_uri = $this->dbname . "/" . $document->_id . "?rev=" . $document->_rev;
-    print_r($full_uri);
     $this->rest_client->http_delete($full_uri);
   }
   

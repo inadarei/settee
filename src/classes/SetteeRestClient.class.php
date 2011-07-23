@@ -20,11 +20,11 @@ class SetteeRestClient {
   */
   function get_instance($base_url) {
 
-    if (empty($curl_workers[$base_url])) {
-      $curl_workers[$base_url] = new SetteeRestClient($base_url);
+    if (empty($this->curl_workers[$base_url])) {
+      $this->curl_workers[$base_url] = new SetteeRestClient($base_url);
     }
     
-    return $curl_workers[$base_url];
+    return $this->curl_workers[$base_url];
   }
   
   /**
@@ -99,9 +99,6 @@ class SetteeRestClient {
     curl_setopt($this->curl, CURLOPT_URL, $this->get_full_url($uri));
     curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $http_method);
 
-
-      print ("\n   ####  " . $this->get_full_url($uri) . "\n");
-    
     $response = curl_exec($this->curl);
     $response_decoded = $this->decode_response($response);
     $response = array('json' => $response, 'decoded'=>$response_decoded);
@@ -118,8 +115,8 @@ class SetteeRestClient {
    */
   private function check_status($response) {
     $resp_code = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-    
-    if ($resp_code < 199 || $resp_code > 399 || !empty($response['decoded']['error'])) {
+
+    if ($resp_code < 199 || $resp_code > 399 || !empty($response['decoded']->error)) {
       $msg = "CouchDB returned: \"HTTP 1.1. $resp_code\". ERROR: " . $response['json'];
       throw new SetteeRestClientException($msg);
     }
@@ -134,7 +131,7 @@ class SetteeRestClient {
    *    decoded PHP object
    */
   private function decode_response($json) {
-    return json_decode($json, true);
+    return json_decode($json);
   }
 
   /**

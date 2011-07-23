@@ -1,20 +1,15 @@
 <?php
 
-require (realpath(dirname(__FILE__) . '/../src/settee.php'));
+require_once (realpath(dirname(__FILE__) . '/../src/settee.php'));
+require_once (dirname(__FILE__) . '/SetteeTestCase.class.php');
 
-class SetteeRestClientTest extends PHPUnit_Framework_TestCase
-{
+class SetteeRestClientTest extends SetteeTestCase {
 
-  private $server;
-  private $db_url;
-  private $db_user;
-  private $db_pass;
-
+  private $rest_client;
+  
   public function setUp() {
-    $this->db_url  = isset($GLOBALS['db_url'])  ? $GLOBALS['db_url']  : 'http://127.0.0.1:5984';
-    $this->db_user = isset($GLOBALS['db_user']) ? $GLOBALS['db_user'] : 'admin';
-    $this->db_pass = isset($GLOBALS['db_pass']) ? $GLOBALS['db_pass'] : 'admin';
-    $this->server = SetteeRestClient::get_instance($this->db_url);
+    parent::setUp();
+    $this->rest_client = SetteeRestClient::get_instance($this->db_url);
   }
 
   public function test_get_full_url() {
@@ -29,19 +24,19 @@ class SetteeRestClientTest extends PHPUnit_Framework_TestCase
     $get_full_url_method->setAccessible(TRUE);
 
     $uri = 'irakli/26cede9ab9cd8fcd67895eb05200d1ea';
-    //-- Equivalent to: $calc = $this->server->get_full_url($uri); but for a private method.
-    $calc = $get_full_url_method->invokeArgs($this->server, array($uri));
+    //-- Equivalent to: $calc = $this->rest_client->get_full_url($uri); but for a private method.
+    $calc = $get_full_url_method->invokeArgs($this->rest_client, array($uri));
     //--
     $expected = $this->db_url . '/irakli/26cede9ab9cd8fcd67895eb05200d1ea';
     $this->assertEquals($calc, $expected, "Full URL Generation with DB and ID");
 
     $uri = 'irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267';
-    $calc = $get_full_url_method->invokeArgs($this->server, array($uri));
+    $calc = $get_full_url_method->invokeArgs($this->rest_client, array($uri));
     $expected = $this->db_url . '/irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267';
     $this->assertEquals($calc, $expected, "Full URL Generation with DB, ID and Single Query Parameter");
     
     $uri = 'irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267&second=foo';
-    $calc = $get_full_url_method->invokeArgs($this->server, array($uri));
+    $calc = $get_full_url_method->invokeArgs($this->rest_client, array($uri));
     $expected = $this->db_url . '/irakli/26cede9ab9cd8fcd67895eb05200d1ea?rev=2-21587f7dffc43b4100f40168f309a267&second=foo';
     $this->assertEquals($calc, $expected, "Full URL Generation with DB, ID and Two Query Parameters");
 

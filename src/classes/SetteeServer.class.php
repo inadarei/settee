@@ -40,7 +40,7 @@ class SetteeServer {
       $db = $db->get_name();
     }
     $ret = $this->rest_client->http_put($db);
-    if (!empty($ret['decoded']["error"])) {
+    if (!empty($ret['decoded']->error)) {
       throw new SetteeDatabaseException("Could not create database: " . $ret["json"]);
     }
     return $ret['decoded'];
@@ -62,7 +62,7 @@ class SetteeServer {
       $db = $db->get_name();
     }
     $ret =  $this->rest_client->http_delete($db);
-    if (!empty($ret['decoded']["error"])) {
+    if (!empty($ret['decoded']->error)) {
       throw new SetteeDatabaseException("Could not create database: " . $ret["json"]);
     }
     return $ret['decoded'];
