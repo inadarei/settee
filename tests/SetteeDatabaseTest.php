@@ -86,6 +86,18 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $this->fail('Document still available for retrieval after being deleted. [object-based]');
   }
 
+  public function test_invalid_document() {
+    $doc = 12345;
+    try {
+      $doc = $this->db->save($doc);
+    } catch (SetteeRestClientException $e) {
+      // we expect exception to fire, so this is good.
+      return;
+    }
+
+    $this->fail('Document saved with invalid format');
+  }
+
   public function test_inline_attachment_json() {
     $doc = '{
               "_id":"attachment_doc",
@@ -108,7 +120,7 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $doc->_attachments = new stdClass();
     $doc->_attachments->foo = new stdClass();
     $doc->_attachments->foo->content_type = "text/plain";
-    $doc->_attachments->foo->data = "VGhpcyBpcyBhIGJhc2U2NCBlbmNvZGVkIHRleHQ=";
+    $doc->_attachments->foo->data = base64_encode("This is encoded text");
     $db_doc = $this->db->save($doc);
     $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment save successful [object-based]");
   }

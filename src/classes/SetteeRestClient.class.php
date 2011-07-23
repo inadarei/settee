@@ -123,6 +123,24 @@ class SetteeRestClient {
   }
 
   /**
+   * @param  $path
+   * @return void
+   */
+  public function file_type ($path)  {
+    $ftype = 'application/octet-stream';
+    
+    if (function_exists("finfo_file")) {
+      $finfo = @new finfo(FILEINFO_MIME);
+      $fres = @$finfo->file($path);
+      if (is_string($fres) && !empty($fres)) {
+         $ftype = $fres;
+      }
+    }
+
+    return $ftype;
+  }
+
+  /**
    *
    * @param $json
    *    json-encoded response from CouchDB
