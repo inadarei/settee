@@ -26,8 +26,11 @@ $doc->pets = array ("whitey" => "labrador", "mikey" => "pug");
 
 $doc = $db->create($doc);
 
-$db_doc = $db->get($doc->id);
+$db_doc = $db->get($doc->_id);
 print_r($db_doc);
 
+$db->delete($doc);
+
+echo "\n" . urlencode ("&");
 
 

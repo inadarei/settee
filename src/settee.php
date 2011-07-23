@@ -1,6 +1,6 @@
 <?php
 
-require(dirname(__FILE__) . '/classes/restclient.class.php');
+require(dirname(__FILE__) . '/classes/SetteeRestClient.class.php');
 
-require(dirname(__FILE__) . '/classes/server.class.php');
-require(dirname(__FILE__) . '/classes/database.class.php');
+require(dirname(__FILE__) . '/classes/SetteeServer.class.php');
+require(dirname(__FILE__) . '/classes/SetteeDatabase.class.php');

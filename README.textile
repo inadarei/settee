@@ -16,3 +16,5 @@ h3. Server Functions
 # Document API
 ## Create a document:
 @$ret = $db->create($doc);@
+## Retrieve a document:
+@$db_doc = $db->get($id);@
