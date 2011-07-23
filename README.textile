@@ -14,7 +14,9 @@ h3. Server Functions
 ## Get a database object
 @$db = $server->get_db('irakli_test');@
 # Document API
-## Create a document:
-@$ret = $db->create($doc);@
+## Create/Update a document:
+@$ret = $db->save($doc);@
 ## Retrieve a document:
 @$db_doc = $db->get($id);@
+## Delete a document:
+@$db_doc = $db->get($doc);@

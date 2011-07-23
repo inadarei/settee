@@ -17,9 +17,12 @@ class SetteeServer {
 
   
   /**
-  * Class constructor
-  */
-  function __construct($conn_url) {
+   * Class constructor
+   * 
+   * @param $conn_url
+   *    (optional) URL of the CouchDB server to connect to. Default value: http://127.0.0.1:5984
+   */
+  function __construct($conn_url = "http://127.0.0.1:5984") {
     $this->conn_url = rtrim($conn_url, ' /');
     $this->rest_client = SetteeRestClient::get_instance($this->conn_url);
   }
