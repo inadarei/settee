@@ -92,8 +92,22 @@ class SetteeDatabase {
     return $document;
   }
 
+  public function add_attachment($doc, $name, $content, $mime_type) {
+    if (empty($doc->_attachments) || !is_object($doc->_attachments)) {
+      $doc->_attachments = new stdClass();
+    }
+
+    $doc->_attachments->$name = new stdClass();
+    $doc->_attachments->$name->content_type = $mime_type;
+    $doc->_attachments->$name->data = base64_encode($content);
+  }
+
   /**
+   *
+   * Retrieve a document from CouchDB
+   *
    * @throws SetteeWrongInputException
+   * 
    * @param  $id
    *    Unique ID (usually: UUID) of the document to be retrieved.
    * @return
@@ -111,6 +125,29 @@ class SetteeDatabase {
     return $ret['decoded'];
   }
 
+    /**
+   *
+   * Get the latest revision of a document with document id: $id in CouchDB.
+   *
+   * @throws SetteeWrongInputException
+   *
+   * @param  $id
+   *    Unique ID (usually: UUID) of the document to be retrieved.
+   * @return
+   *    database document in PHP object format.
+   */
+  function get_rev($id) {
+    if (empty($id)) {
+      throw new SetteeWrongInputException("Error: Can't query a document without a uuid.");
+    }
+
+    $id = urldecode($id);
+    $full_uri = $this->dbname . "/" . urlencode($id);
+
+    $ret = $this->rest_client->http_head($full_uri);
+    return $ret['decoded'];
+  }
+  
   /**
   * Delete a document
   *
@@ -132,5 +169,5 @@ class SetteeDatabase {
   function get_name() {
     return $this->dbname;
   }
-   
+
 }

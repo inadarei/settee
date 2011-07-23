@@ -57,6 +57,10 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $this->assertTrue(!empty($doc->_id) && !empty($doc->_rev), "Document creation success [json-based]");
 
     $_rev = $doc->_rev;
+
+    //$db_rev = $this->db->get_rev($doc->_id);
+    //$this->assertEquals($_rev, $db_rev, "Document Revision retrieval success [json-based] test");
+    
     $db_doc = $this->db->get($doc->_id);
     $this->assertEquals($_rev, $db_doc->_rev, "Document retrieval success [json-based] test");
 
@@ -114,13 +118,10 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment save successful [json-based]");
   }
 
-  public function test_inline_attachment_obj() {
+  public function test_inline_attachment_obj_content() {
     $doc = new stdClass();
     $doc->_id = "attachment_doc";
-    $doc->_attachments = new stdClass();
-    $doc->_attachments->foo = new stdClass();
-    $doc->_attachments->foo->content_type = "text/plain";
-    $doc->_attachments->foo->data = base64_encode("This is encoded text");
+    $this->db->add_attachment($doc, "foo.txt", "This is some text to be encoded", "text/plain");
     $db_doc = $this->db->save($doc);
     $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment save successful [object-based]");
   }

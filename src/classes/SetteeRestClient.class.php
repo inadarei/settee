@@ -52,7 +52,14 @@ class SetteeRestClient {
   function __destruct() {
      curl_close($this->curl);
   }
-  
+
+  /**
+  * HTTP HEAD
+  */
+  function http_head($uri) {
+    return $this->http_request('HEAD', $uri);
+  }
+
   /**
   * HTTP GET
   */
