@@ -3,7 +3,7 @@
   > sudo pear channel-discover pear.phpunit.de
   > sudo pear install phpunit/PHPUnit
 
-2. You need PHP 5.3.2 or later to run some tests that deal with private or protected methods. If you use earlier
+2. You need PHP 5.3.2 or later to run some tests that deal with private or protected methods. If you use an earlier
   version of PHP, these tests will be skipped.
   
 3. Run all tests with:
