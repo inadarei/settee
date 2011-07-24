@@ -124,6 +124,12 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $this->db->add_attachment($doc, "foo.txt", "This is some text to be encoded", "text/plain");
     $db_doc = $this->db->save($doc);
     $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment save successful [object-based]");
+
+    $doc = new stdClass();
+    $doc->_id = "attachment_doc_autodetect";
+    $this->db->add_attachment($doc, "foo.txt", "This is some other text to be encoded");
+    $db_doc = $this->db->save($doc);
+    $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment save successful [object-based, mime auto-detection]");
   }
 
   public function tearDown() {

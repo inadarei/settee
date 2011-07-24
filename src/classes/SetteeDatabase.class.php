@@ -92,9 +92,13 @@ class SetteeDatabase {
     return $document;
   }
 
-  public function add_attachment($doc, $name, $content, $mime_type) {
+  public function add_attachment($doc, $name, $content, $mime_type = null) {
     if (empty($doc->_attachments) || !is_object($doc->_attachments)) {
       $doc->_attachments = new stdClass();
+    }
+
+    if (empty($mime_type)) {
+      $mime_type = $this->rest_client->content_mime_type($content);
     }
 
     $doc->_attachments->$name = new stdClass();
