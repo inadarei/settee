@@ -22,7 +22,7 @@ h3. Server Functions
 @$db_doc = $db->delete($doc);@
 # Attachments API
 ## Add  content as attachment:
-@$db->add_attachment_file($doc, "foo.txt", "Some text that will be base64 encoded", "text/plain");@
+@$db->add_attachment($doc, "foo.txt", "Some text that will be base64 encoded", "text/plain");@
 ## Add a file path to be attached:
 @$db->add_attachment_file($doc, "foo.pdf", $file_path, "application/pdf");@
 ## Add a file path to be attached (mime-type is auto-detected):
