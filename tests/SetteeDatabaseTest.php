@@ -109,7 +109,7 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $db_rev = $this->db->get_rev($doc->_id);
     $this->assertEquals($_rev, $db_rev, "Document Revision retrieval success");
 
-    
+    // _rev is now attached to this object due to last ->save() call
     $doc->_id = "some_fixed_id";
     $doc->title = "Some Fixed ID";
     $doc = $this->db->save($doc);
@@ -119,6 +119,19 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $db_rev = $this->db->get_rev($doc->_id);
     $this->assertEquals($_rev, $db_rev, "Document Revision retrieval success after re-save");
 
+  }
+
+  public function test_save_auto_revision_detection() {
+    $doc = new stdClass();
+    $doc->_id = "some_fixed_id";
+    $this->db->save($doc);
+
+    $doc = new stdClass();
+    $doc->_id = "some_fixed_id";
+    $doc->extra_field = "some other value";
+
+    $new_doc = $this->db->save($doc, true);
+    $this->assertEquals ($new_doc->extra_field, "some other value", "Testing auto-rev detection by save method");
   }
 
   public function test_inline_attachment_json() {
@@ -184,7 +197,22 @@ VIEW;
     $view = $this->db->get_view("foo_views", "bar_view");
     $this->assertEquals(3, $view->total_rows, "Running a View Success");
 
+  $map_src = <<<VIEW
+function(doc) {
+  if(doc.date) {
+    emit(doc.date, doc);
   }
+}
+VIEW;
+
+  $view = $this->db->save_view("foo_views", "bar_view", $map_src);
+  $this->assertEquals("_design/foo_views", $view->_id, "View Update Success");
+
+  $view = $this->db->get_view("foo_views", "bar_view");
+  $this->assertEquals("Well hello and welcome to my new blog...", $view->rows[0]->value->body, "Running a View Success");
+
+
+}
 
   /**
    * Create some sample docs for running tests on them.
