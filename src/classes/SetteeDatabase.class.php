@@ -42,7 +42,7 @@ class SetteeDatabase {
     return $ret['decoded']->uuids[0]; // should never be empty at this point, so no checking
   }
 
-  /**
+ /**
   * Create or update a document database
   *
   * @param $document
@@ -56,17 +56,18 @@ class SetteeDatabase {
   * one of creation and you will get a duplicate document exception from CouchDB. Also, you may not provide "_rev" but
   * not provide "_id" since that is an invalid input.
   *
+  * @param $allowRevAutoDetection
+  *   Default: false. When true and _rev is missing from the document, save() function will auto-detect latest revision
+  * for a document and use it. This option is "false" by default because it involves an extra http HEAD request and
+  * therefore can make save() operation slightly slower if such auto-detection is not required.
+  *
   * @return
   *     document object with the database id (uuid) and revision attached;
   *
   *  @throws SetteeCreateDatabaseException
   */
-  function save($document) {
-    if (is_object($document) || is_array($document)) {
-      $document_json = json_encode($document, JSON_NUMERIC_CHECK);
-    }
-    else {
-      $document_json = $document;
+  function save($document, $allowRevAutoDetection = false) {
+    if (is_string($document)) {
       $document = json_decode($document);
     }
 
@@ -78,14 +79,24 @@ class SetteeDatabase {
     }
     else {
       $id = $document->_id;
+
+      if ($allowRevAutoDetection) {
+        try {
+          $rev = $this->get_rev($id);
+        } catch (SetteeRestClientException $e) {
+          // auto-detection may fail legitimately, if a document has never been saved before (new doc), so skipping error
+        }
+        if (!empty($rev)) {
+          $document->_rev = $rev;
+        }
+      }
     }
 
     $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
-
+    $document_json = json_encode($document, JSON_NUMERIC_CHECK);
+    
     $ret = $this->rest_client->http_put($full_uri, $document_json);
-    if (!is_object($document)) {
-      $document = json_decode($document);
-    }
+
     $document->_id = $ret['decoded']->id;
     $document->_rev = $ret['decoded']->rev;
 
@@ -213,7 +224,9 @@ class SetteeDatabase {
     if (!empty($reduce_src)) {
       $obj->views->$view_name->reduce = $reduce_src;
     }
-    return $this->save($obj);
+
+    // allow safe updates (even if slightly slower due to extra: rev-detection check).
+    return $this->save($obj, true);
   }
 
   /**
