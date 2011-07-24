@@ -92,6 +92,16 @@ class SetteeDatabase {
     return $document;
   }
 
+  /**
+   * @param  $doc
+   * @param  $name
+   * @param  $content
+   *    Content of the attachment in a string-buffer format. This function will automatically base64-encode content for
+   *    you, so you don't have to do it.
+   * @param  $mime_type
+   *    Optional. Will be auto-detected if not provided
+   * @return void
+   */
   public function add_attachment($doc, $name, $content, $mime_type = null) {
     if (empty($doc->_attachments) || !is_object($doc->_attachments)) {
       $doc->_attachments = new stdClass();
@@ -104,6 +114,20 @@ class SetteeDatabase {
     $doc->_attachments->$name = new stdClass();
     $doc->_attachments->$name->content_type = $mime_type;
     $doc->_attachments->$name->data = base64_encode($content);
+  }
+
+  /**
+   * @param  $doc
+   * @param  $name
+   * @param  $file
+   *    Full path to a file (e.g. as returned by PHP's realpath function).
+   * @param  $mime_type
+   *    Optional. Will be auto-detected if not provided
+   * @return void
+   */
+  public function add_attachment_file($doc, $name, $file, $mime_type = null) {
+    $content = file_get_contents($file);
+    $this->add_attachment($doc, $name, $content, $mime_type);
   }
 
   /**
