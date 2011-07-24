@@ -58,9 +58,6 @@ class SetteeDatabaseTest extends SetteeTestCase {
 
     $_rev = $doc->_rev;
 
-    //$db_rev = $this->db->get_rev($doc->_id);
-    //$this->assertEquals($_rev, $db_rev, "Document Revision retrieval success [json-based] test");
-    
     $db_doc = $this->db->get($doc->_id);
     $this->assertEquals($_rev, $db_doc->_rev, "Document retrieval success [json-based] test");
 
@@ -100,6 +97,28 @@ class SetteeDatabaseTest extends SetteeTestCase {
     }
 
     $this->fail('Document saved with invalid format');
+  }
+
+  public function test_get_rev() {
+    $doc = new stdClass();
+    $doc->_id = "some_fixed_id";
+    $doc = $this->db->save($doc);
+
+    $_rev = $doc->_rev;
+
+    $db_rev = $this->db->get_rev($doc->_id);
+    $this->assertEquals($_rev, $db_rev, "Document Revision retrieval success");
+
+    
+    $doc->_id = "some_fixed_id";
+    $doc->title = "Some Fixed ID";
+    $doc = $this->db->save($doc);
+
+    $_rev = $doc->_rev;
+
+    $db_rev = $this->db->get_rev($doc->_id);
+    $this->assertEquals($_rev, $db_rev, "Document Revision retrieval success after re-save");
+
   }
 
   public function test_inline_attachment_json() {
