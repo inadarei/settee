@@ -18,6 +18,8 @@ h3. Server Functions
 @$ret = $db->save($doc);@
 ## Retrieve a document:
 @$db_doc = $db->get($id);@
+## Determine the latest revision_id for a document:
+@$rev = $db->get_rev($id);@
 ## Delete a document:
 @$db_doc = $db->delete($doc);@
 # Attachments API
@@ -32,3 +34,12 @@ h3. Server Functions
 @$view = $db->save_view("foo_views", "bar_view", $map_src, $reduce_src);@
 ## Get a view (run query and get results):
 @$view = $db->get_view("foo_views", "bar_view");@
+
+h3. Requirements
+# PHP 5.2 or newer
+
+h3. Recommended
+# PHP 5.3 or newer. With PHP 5.2 following functionality will not work:
+## Some unit-tests
+## Mime type auto-detection.
+# pecl_http

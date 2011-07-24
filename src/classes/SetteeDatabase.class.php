@@ -168,11 +168,10 @@ class SetteeDatabase {
       throw new SetteeWrongInputException("Error: Can't query a document without a uuid.");
     }
 
-    $id = urldecode($id);
     $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
-
-    $ret = $this->rest_client->http_head($full_uri);
-    return $ret['decoded'];
+    $headers = $this->rest_client->http_head($full_uri);
+    $etag = str_replace('"', '', $headers['Etag']);
+    return $etag;
   }
   
   /**

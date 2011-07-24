@@ -46,18 +46,72 @@ class SetteeRestClient {
     
   }
 
-  /**
+ /**
   * Class destructor cleans up any resources
   */
   function __destruct() {
      curl_close($this->curl);
   }
 
-  /**
+ /**
   * HTTP HEAD
+  *
+  * @return
+  *     Raw HTTP Headers of the response.
+  *
+  * @see: http://www.php.net/manual/en/context.params.php
+  * 
   */
   function http_head($uri) {
-    return $this->http_request('HEAD', $uri);
+    curl_setopt($this->curl, CURLOPT_HEADER, 1);
+
+    $full_url = $this->get_full_url($uri);
+    curl_setopt($this->curl, CURLOPT_URL, $full_url);
+    curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, 'HEAD');
+    curl_setopt($this->curl, CURLOPT_NOBODY, true);
+
+
+    $response = curl_exec($this->curl);
+    // Restore default values
+    curl_setopt($this->curl, CURLOPT_NOBODY, false);
+    curl_setopt($this->curl, CURLOPT_HEADER, false);
+    
+    $resp_code = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
+    if ($resp_code == 404 ) {
+      throw new SetteeRestClientException("Couch document not found at: '$full_url'");
+    }
+
+    if (function_exists('http_parse_headers')) {
+      $headers = http_parse_headers($response);
+    }
+    else {
+      $headers = $this->_http_parse_headers($response);
+    }
+    
+    return $headers;
+  }
+
+  /**
+   * Backup PHP impl. for when PECL http_parse_headers() function is not available
+   *
+   * @param  $header
+   * @return array
+   * @source http://www.php.net/manual/en/function.http-parse-headers.php#77241
+   */
+  private function _http_parse_headers( $header ) {
+    $retVal = array();
+    $fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $header));
+    foreach( $fields as $field ) {
+        if( preg_match('/([^:]+): (.+)/m', $field, $match) ) {
+            $match[1] = preg_replace('/(?<=^|[\x09\x20\x2D])./e', 'strtoupper("\0")', strtolower(trim($match[1])));
+            if( isset($retVal[$match[1]]) ) {
+                $retVal[$match[1]] = array($retVal[$match[1]], $match[2]);
+            } else {
+                $retVal[$match[1]] = trim($match[2]);
+            }
+        }
+    }
+    return $retVal;
   }
 
   /**
