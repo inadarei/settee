@@ -59,8 +59,30 @@ class SetteeRestClientTest extends SetteeTestCase {
 
     $type = $this->rest_client->file_mime_type(dirname(__FILE__) . "/resources/couch-tag.xml");
     $this->assertEquals("application/xml", $type, "XML Mime Type Detection");
-
   }
+
+  public function test_content_mime_type() {
+    $content = file_get_contents(dirname(__FILE__) . "/resources/couch-logo.jpg");
+    $type = $this->rest_client->content_mime_type($content);
+    $this->assertEquals("image/jpeg", $type, "Jpeg Mime Type Detection");
+
+    $content = file_get_contents(dirname(__FILE__) . "/resources/couch-logo.pdf");
+    $type = $this->rest_client->content_mime_type($content);
+    $this->assertEquals("application/pdf", $type, "PDF Mime Type Detection");
+
+    $content = file_get_contents(dirname(__FILE__) . "/resources/couch-logo.png");
+    $type = $this->rest_client->content_mime_type($content);
+    $this->assertEquals("image/png", $type, "PNG Mime Type Detection");
+
+    $content = file_get_contents(dirname(__FILE__) . "/resources/couch-tag.ini");
+    $type = $this->rest_client->content_mime_type($content);
+    $this->assertEquals("text/plain", $type, "Text Mime Type Detection");
+
+    $content = file_get_contents(dirname(__FILE__) . "/resources/couch-tag.xml");
+    $type = $this->rest_client->content_mime_type($content);
+    $this->assertEquals("application/xml", $type, "XML Mime Type Detection");
+  }
+
 
 
 }

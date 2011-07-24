@@ -149,6 +149,26 @@ class SetteeRestClient {
   }
 
   /**
+   * @param  $content
+   *    content of a file in a string buffer format.
+   * @return void
+   */
+  public function content_mime_type ($content)  {
+    $ftype = 'application/octet-stream';
+
+    if (function_exists("finfo_file")) {
+      $finfo = new finfo(FILEINFO_MIME_TYPE | FILEINFO_SYMLINK);
+      $fres = $finfo->buffer($content);
+      if (is_string($fres) && !empty($fres)) {
+         $ftype = $fres;
+      }
+    }
+
+    return $ftype;
+  }
+  
+
+  /**
    *
    * @param $json
    *    json-encoded response from CouchDB
