@@ -146,7 +146,57 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $this->db->add_attachment_file($doc, "foo.pdf", $file_path);
     $db_doc = $this->db->save($doc);
     $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment of file successful w/ mime type auto-detection");
+  }
 
+  public function test_view_lifecycle() {
+    $this->_create_some_sample_docs();
+    
+  $map_src = <<<VIEW
+function(doc) {
+  if(doc.date && doc.title) {
+    emit(doc.date, doc.title);
+  }
+}
+VIEW;
+
+    $view = $this->db->save_view("foo_views", "bar_view", $map_src);
+    $this->assertEquals("_design/foo_views", $view->_id, "View Creation Success");
+    
+    $view = $this->db->get_view("foo_views", "bar_view");
+    $this->assertEquals(3, $view->total_rows, "Running a View Success");
+
+  }
+
+  /**
+   * Create some sample docs for running tests on them.
+   *
+   * <p>This sample was taken from a wonderful book:
+   *  CouchDB: The Definitive Guide (Animal Guide) by J. Chris Anderson, Jan Lehnardt and Noah Slater
+   *  http://www.amazon.com/CouchDB-Definitive-Guide-Relax-Animal/dp/0596155891/ref=sr_1_1?ie=UTF8&qid=1311533443&sr=8-1
+   * 
+   * @return void
+   */
+  private function _create_some_sample_docs() {
+    $doc = new stdClass();
+    $doc->_id = "biking";
+    $doc->title = "Biking";
+    $doc->body = "My biggest hobby is mountainbiking";
+    $doc->date =  "2009/01/30 18:04:11";
+    $this->db->save($doc);
+
+    $doc = new stdClass();
+    $doc->_id = "bought-a-cat";
+    $doc->title = "Bought a Cat";
+    $doc->body = "I went to the the pet store earlier and brought home a little kitty...";
+    $doc->date =  "2009/02/17 21:13:39";
+    $this->db->save($doc);
+
+    $doc = new stdClass();
+    $doc->_id = "hello-world";
+    $doc->title = "Hello World";
+    $doc->body = "Well hello and welcome to my new blog...";
+    $doc->date = "2009/01/15 15:52:20";
+    $this->db->save($doc);
   }
 
   public function tearDown() {

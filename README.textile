@@ -22,8 +22,13 @@ h3. Server Functions
 @$db_doc = $db->delete($doc);@
 # Attachments API
 ## Add  content as attachment:
-@$this->db->add_attachment_file($doc, "foo.txt", "Some text that will be base64 encoded", "text/plain");@
+@$db->add_attachment_file($doc, "foo.txt", "Some text that will be base64 encoded", "text/plain");@
 ## Add a file path to be attached:
-@$this->db->add_attachment_file($doc, "foo.pdf", $file_path, "application/pdf");@
+@$db->add_attachment_file($doc, "foo.pdf", $file_path, "application/pdf");@
 ## Add a file path to be attached (mime-type is auto-detected):
-@$this->db->add_attachment_file($doc, "foo.pdf", $file_path);@
+@$db->add_attachment_file($doc, "foo.pdf", $file_path);@
+# Views API
+## Create a new view or save a view:
+@$view = $db->save_view("foo_views", "bar_view", $map_src, $reduce_src);@
+## Get a view (run query and get results):
+@$view = $db->get_view("foo_views", "bar_view");@

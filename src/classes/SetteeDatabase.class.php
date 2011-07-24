@@ -80,7 +80,7 @@ class SetteeDatabase {
       $id = $document->_id;
     }
 
-    $full_uri = $this->dbname . "/" . urlencode($id);
+    $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
 
     $ret = $this->rest_client->http_put($full_uri, $document_json);
     if (!is_object($document)) {
@@ -146,8 +146,7 @@ class SetteeDatabase {
       throw new SetteeWrongInputException("Error: Can't retrieve a document without a uuid.");
     }
 
-    $id = urldecode($id);
-    $full_uri = $this->dbname . "/" . urlencode($id);
+    $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
 
     $ret = $this->rest_client->http_get($full_uri);
     return $ret['decoded'];
@@ -170,7 +169,7 @@ class SetteeDatabase {
     }
 
     $id = urldecode($id);
-    $full_uri = $this->dbname . "/" . urlencode($id);
+    $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
 
     $ret = $this->rest_client->http_head($full_uri);
     return $ret['decoded'];
@@ -189,8 +188,65 @@ class SetteeDatabase {
       $document = json_decode($document);
     }
 
-    $full_uri = $this->dbname . "/" . urlencode($document->_id) . "?rev=" . $document->_rev;
+    $full_uri = $this->dbname . "/" . $this->safe_urlencode($document->_id) . "?rev=" . $document->_rev;
     $this->rest_client->http_delete($full_uri);
+  }
+
+  
+  /*-----------------  View-related functions --------------*/
+
+  /**
+   * Create a new view or update an existing one.
+   *
+   * @param  $design_doc
+   * @param  $view_name
+   * @param  $map_src
+   *    Source code of the map function in Javascript
+   * @param  $reduce_src
+   *    Source code of the reduce function  in Javascript (optional)
+   * @return void
+   */
+  function save_view($design_doc, $view_name, $map_src, $reduce_src = null) {
+    $obj = new stdClass();
+    $obj->_id = "_design/" . urlencode($design_doc);
+    $view_name = urlencode($view_name);
+    $obj->views->$view_name->map = $map_src;
+    if (!empty($reduce_src)) {
+      $obj->views->$view_name->reduce = $reduce_src;
+    }
+    return $this->save($obj);
+  }
+
+  /**
+   * Create a new view or update an existing one.
+   *
+   * @param  $design_doc
+   * @param  $view_name
+   * @param  $map_src
+   *    Source code of the map function in Javascript
+   * @param  $reduce_src
+   *    Source code of the reduce function  in Javascript (optional)
+   * @return void
+   */
+  function get_view($design_doc, $view_name) {
+    $id = "_design/" . urlencode($design_doc);
+    $view_name = urlencode($view_name);
+    $id .= "/_view/$view_name";
+    return $this->get($id);
+  }
+
+  /**
+   * @param  $id
+   * @return
+   *    return a properly url-encoded id.
+   */
+  private function safe_urlencode($id) {
+    //-- System views like _design can have "/" in their URLs.
+    $id = urlencode($id);
+    if (substr($id, 0, 1) == '_') {
+      $id = str_replace('%2F', '/', $id);
+    }
+    return $id;
   }
   
   /** Getter for a database name */
