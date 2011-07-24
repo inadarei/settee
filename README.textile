@@ -19,4 +19,11 @@ h3. Server Functions
 ## Retrieve a document:
 @$db_doc = $db->get($id);@
 ## Delete a document:
-@$db_doc = $db->get($doc);@
+@$db_doc = $db->delete($doc);@
+# Attachments API
+## Add  content as attachment:
+@$this->db->add_attachment_file($doc, "foo.txt", "Some text that will be base64 encoded", "text/plain");@
+## Add a file path to be attached:
+@$this->db->add_attachment_file($doc, "foo.pdf", $file_path, "application/pdf");@
+## Add a file path to be attached (mime-type is auto-detected):
+@$this->db->add_attachment_file($doc, "foo.pdf", $file_path);@

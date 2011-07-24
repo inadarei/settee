@@ -136,14 +136,14 @@ class SetteeDatabaseTest extends SetteeTestCase {
     $doc = new stdClass();
     $doc->_id = "attachment_doc";
     $file_path = dirname(__FILE__) . "/resources/couch-logo.pdf";
-    $this->db->add_attachment_file($doc, "foo.txt", $file_path, "application/pdf");
+    $this->db->add_attachment_file($doc, "foo.pdf", $file_path, "application/pdf");
     $db_doc = $this->db->save($doc);
     $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment of file successful");
 
     $doc = new stdClass();
     $doc->_id = "attachment_doc_autodetect";
     $file_path = dirname(__FILE__) . "/resources/couch-logo.pdf";
-    $this->db->add_attachment_file($doc, "foo.txt", $file_path);
+    $this->db->add_attachment_file($doc, "foo.pdf", $file_path);
     $db_doc = $this->db->save($doc);
     $this->assertTrue(is_object($db_doc->_attachments), "Inline attachment of file successful w/ mime type auto-detection");
 
