@@ -209,8 +209,17 @@ VIEW;
   $this->assertEquals("_design/foo_views", $view->_id, "View Update Success");
 
   $view = $this->db->get_view("foo_views", "bar_view");
-  $this->assertEquals("Well hello and welcome to my new blog...", $view->rows[0]->value->body, "Running a View Success");
+  $this->assertEquals("Well hello and welcome to my new blog...", $view->rows[0]->value->body, "Running a View Success (after update)");
 
+  $view = $this->db->get_view("foo_views", "bar_view", "2009/02/17 21:13:39");
+  $this->assertEquals("Bought a Cat", $view->rows[0]->value->title, "Running a Parametrized View");
+
+  $view = $this->db->get_view("foo_views", "bar_view", array("2009/01/30 18:04:11", "2009/02/17 21:13:39"));
+  $this->assertEquals("Biking", $view->rows[0]->value->title, "Running a Parametrized View with range");
+
+  $view = $this->db->get_view("foo_views", "bar_view", array("2009/02/17 21:13:39", "2009/01/30 18:04:11"), true);
+  $this->assertEquals("Bought a Cat", $view->rows[0]->value->title, "Running a Parametrized View with range, descending");
+  $this->assertEquals(2, count($view->rows), "Running a Parametrized View with range, descending [count]");
 
 }
 

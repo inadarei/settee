@@ -234,17 +234,46 @@ class SetteeDatabase {
    *
    * @param  $design_doc
    * @param  $view_name
-   * @param  $map_src
-   *    Source code of the map function in Javascript
-   * @param  $reduce_src
-   *    Source code of the reduce function  in Javascript (optional)
+   * @param  $key
+   *    key parameter to a view. Can be a single value or an array (for a range). If passed an array, function assumes
+   *    that first element is startkey, second: endkey.
+   * @param  $descending
+   *    return results in descending order. Please don't forget that if you are using a startkey/endkey, when you change
+   *  order you also need to swap startkey and endkey values!
+   * 
    * @return void
    */
-  function get_view($design_doc, $view_name) {
+  function get_view($design_doc, $view_name, $key = null, $descending = false) {
     $id = "_design/" . urlencode($design_doc);
     $view_name = urlencode($view_name);
     $id .= "/_view/$view_name";
-    return $this->get($id);
+
+    $data = array();
+    if (!empty($key)) {
+      if (is_string($key)) {
+        $data = "key=" . '"' . $key . '"';
+      }
+      elseif (is_array($key)) {
+        list($startkey, $endkey) = $key;
+        $data = "startkey=" . '"' . $startkey . '"&' . "endkey=" . '"' . $endkey . '"';
+      }
+
+      if ($descending) {
+        $data .= "&descending=true";
+      }
+    }
+
+
+
+    if (empty($id)) {
+      throw new SetteeWrongInputException("Error: Can't retrieve a document without a uuid.");
+    }
+
+    $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
+
+    $ret = $this->rest_client->http_get($full_uri, $data);
+    return $ret['decoded'];
+    
   }
 
   /**
@@ -254,7 +283,7 @@ class SetteeDatabase {
    */
   private function safe_urlencode($id) {
     //-- System views like _design can have "/" in their URLs.
-    $id = urlencode($id);
+    $id = rawurlencode($id);
     if (substr($id, 0, 1) == '_') {
       $id = str_replace('%2F', '/', $id);
     }

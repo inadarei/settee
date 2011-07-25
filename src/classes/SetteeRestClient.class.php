@@ -118,11 +118,10 @@ class SetteeRestClient {
   * HTTP GET
   */
   function http_get($uri, $data = array()) {
-    $data = (is_array($data)) ? http_build_query($data) : urlencode(trim($data));
+    $data = (is_array($data)) ? http_build_query($data) : $data;
     if (!empty($data)) {
       $uri .= "?$data";
     }
-
     return $this->http_request('GET', $uri);
   }
   
