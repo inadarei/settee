@@ -38,6 +38,8 @@ h3. Server Functions
 @$view = $db->get_view("foo_views", "bar_view", "2009/02/17 21:13:39");@
 ## Parametrized view with key range:
 @$view = $db->get_view("foo_views", "bar_view", array("2009/01/30 18:04:11", "2009/02/17 21:13:39"));@
+## Parametrized view with key range, ordered descending:
+@$view = $db->get_view("foo_views", "bar_view", array("2009/01/30 18:04:11", "2009/02/17 21:13:39"), true);@
 
 
 h3. Requirements
