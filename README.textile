@@ -31,15 +31,16 @@ h3. Server Functions
 @$db->add_attachment_file($doc, "foo.pdf", $file_path);@
 # Views API
 ## Create a new view or save a view:
-@$view = $db->save_view("foo_views", "bar_view", $map_src, $reduce_src);@
+@$view = $db->save_view("some_design_document_id", "a_view_name", $map_src);@
+@$view = $db->save_view("some_design_document_id", "a_view_name", $map_src, $reduce_src);@
 ## Get a view (run query and get results):
-@$view = $db->get_view("foo_views", "bar_view");@
+@$view = $db->get_view("some_design_document_id", "a_view_name");@
 ## Parametrized view:
-@$view = $db->get_view("foo_views", "bar_view", "2009/02/17 21:13:39");@
+@$view = $db->get_view("some_design_document_id", "a_view_name", "2009/02/17 21:13:39");@
 ## Parametrized view with key range:
-@$view = $db->get_view("foo_views", "bar_view", array("2009/01/30 18:04:11", "2009/02/17 21:13:39"));@
+@$view = $db->get_view("some_design_document_id", "a_view_name", array("2009/01/30 18:04:11", "2009/02/17 21:13:39"));@
 ## Parametrized view with key range, ordered descending:
-@$view = $db->get_view("foo_views", "bar_view", array("2009/01/30 18:04:11", "2009/02/17 21:13:39"), true);@
+@$view = $db->get_view("some_design_document_id", "a_view_name", array("2009/01/30 18:04:11", "2009/02/17 21:13:39"), true);@
 
 
 h3. Requirements
