@@ -91,7 +91,7 @@ class SetteeDatabase {
         }
       }
     }
-
+    
     $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
     $document_json = json_encode($document, JSON_NUMERIC_CHECK);
     

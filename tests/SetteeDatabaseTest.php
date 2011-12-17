@@ -223,6 +223,24 @@ VIEW;
 
 }
 
+  function test_two_views_in_a_design_doc() {
+    
+     $map_src = <<<VIEW
+function(doc) {
+  if(doc.date && doc.title) {
+    emit(doc.date, doc.title);
+  }
+}
+VIEW;
+
+    $view = $this->db->save_view("a_settee_design_doc", "foo_view", $map_src);
+    $this->assertTrue(isset($view->views->foo_view), "View1 Creation Success");
+
+    $view = $this->db->save_view("a_settee_design_doc", "bar_view", $map_src);
+    $this->assertTrue(isset($view->views->bar_view), "View1 Creation Success");
+
+  }
+
   /**
    * Create some sample docs for running tests on them.
    *
