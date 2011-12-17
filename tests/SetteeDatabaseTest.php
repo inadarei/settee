@@ -237,8 +237,7 @@ VIEW;
     $this->assertTrue(isset($view->views->foo_view), "View1 Creation Success");
 
     $view = $this->db->save_view("a_settee_design_doc", "bar_view", $map_src);
-    $this->assertTrue(isset($view->views->bar_view), "View1 Creation Success");
-
+    $this->assertTrue(isset($view->views->bar_view), "View2 Creation Success");
   }
 
   /**

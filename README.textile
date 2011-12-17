@@ -29,6 +29,13 @@ h3. Server Functions
 @$db->add_attachment_file($doc, "foo.pdf", $file_path, "application/pdf");@
 ## Add a file path to be attached (mime-type is auto-detected):
 @$db->add_attachment_file($doc, "foo.pdf", $file_path);@
+## Full attachment saving example:
+    $doc = new stdClass();
+    $doc->_id = "attachment_doc";
+    $file_path = dirname(__FILE__) . "/resources/couch-logo.pdf";
+    $this->db->add_attachment_file($doc, "foo.pdf", $file_path, "application/pdf");
+    $db_doc = $this->db->save($doc);
+## ATTENTION: there is no "load_attachments" method, because when you load a document, all its attachments get loaded with it, as well.
 # Views API
 ## Create a new view or save a view:
 @$view = $db->save_view("some_design_document_id", "a_view_name", $map_src);@

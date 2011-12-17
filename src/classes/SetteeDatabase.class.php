@@ -125,7 +125,7 @@ class SetteeDatabase {
     $doc->_attachments->$name = new stdClass();
     $doc->_attachments->$name->content_type = $mime_type;
     $doc->_attachments->$name->data = base64_encode($content);
-  }
+  }  
 
   /**
    * @param  $doc
