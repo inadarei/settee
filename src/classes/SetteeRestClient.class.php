@@ -18,13 +18,13 @@ class SetteeRestClient {
   /**
   * Singleton factory method   
   */
-  function get_instance($base_url) {
+  static function get_instance($base_url) {
 
-    if (empty($this->curl_workers[$base_url])) {
-      $this->curl_workers[$base_url] = new SetteeRestClient($base_url);
+    if (empty(self::$curl_workers[$base_url])) {
+      self::$curl_workers[$base_url] = new SetteeRestClient($base_url);
     }
     
-    return $this->curl_workers[$base_url];
+    return self::$curl_workers[$base_url];
   }
   
   /**
