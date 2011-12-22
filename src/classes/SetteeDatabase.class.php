@@ -97,8 +97,8 @@ class SetteeDatabase {
     
     $ret = $this->rest_client->http_put($full_uri, $document_json);
 
-    $document->_id = $ret['decoded']->id;
-    $document->_rev = $ret['decoded']->rev;
+    $document['_id'] = $ret['decoded']->id;
+    $document['_rev'] = $ret['decoded']->rev;
 
     return $document;
   }
