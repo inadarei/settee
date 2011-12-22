@@ -181,6 +181,9 @@ class SetteeDatabase {
 
     $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
     $headers = $this->rest_client->http_head($full_uri);
+	if (empty($headers['Etag'])) {
+	  throw new SetteeRestClientException("Error: could not retrieve revision. Server unexpectedly returned empty Etag");
+	}
     $etag = str_replace('"', '', $headers['Etag']);
     return $etag;
   }
