@@ -46,7 +46,7 @@ class SetteeDatabase {
   * Create or update a document database
   *
   * @param $document
-  *     PHP object or a JSON String representing the document to be saved. PHP Objects are JSON-encoded automatically.
+  *     PHP object, associative array or a JSON String representing the document to be saved. PHP Objects and arrays are JSON-encoded automatically.
   *
   * <p>If $document has a an "_id" property set, it will be used as document's unique id (even for "create" operation).
   * If "_id" is missing, CouchDB will be used to generate a UUID.
@@ -69,6 +69,10 @@ class SetteeDatabase {
   function save($document, $allowRevAutoDetection = false) {
     if (is_string($document)) {
       $document = json_decode($document);
+    }
+    
+    if (is_array($document)) {
+      $document = $this->array_to_object($document);
     }
 
     if (empty($document->_id) && empty($document->_rev)) {
@@ -297,5 +301,21 @@ class SetteeDatabase {
   function get_name() {
     return $this->dbname;
   }
-
+  
+  // recursive array2object function
+  // found on the internet
+  function array_to_object($d) {
+    if (is_array($d)) {
+      /*
+      * Return array converted to object
+      * Using __FUNCTION__ (Magic constant)
+      * for recursive call
+      */
+      return (object) array_map(array($this, __FUNCTION__), $d);
+    }
+    else {
+      // Return object
+      return $d;
+    }
+  }
 }
