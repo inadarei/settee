@@ -1,7 +1,10 @@
-1. Make sure you have latest PEAR PHPUnit installed:
-  > sudo pear upgrade
+1. Make sure you have the latest PEAR PHPUnit installed:
   > sudo pear channel-discover pear.phpunit.de
-  > sudo pear install phpunit/PHPUnit
+  > sudo pear channel-discover pear.symfony-project.com
+  > sudo pear channel-discover components.ez.no
+  > sudo pear update-channels
+  > sudo pear upgrade-all
+  > sudo pear install --alldeps phpunit/PHPUnit
 
 2. You need PHP 5.3.2 or later to run some tests that deal with private or protected methods. If you use an earlier
   version of PHP, these tests will be skipped.
