@@ -7,4 +7,5 @@
   version of PHP, these tests will be skipped.
   
 3. Run all tests with:
+  > cd tests
   > phpunit .
