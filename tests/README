@@ -1,5 +1,5 @@
 1. Make sure you have latest PEAR PHPUnit installed:
-  > sudo upgrade pear
+  > sudo pear upgrade
   > sudo pear channel-discover pear.phpunit.de
   > sudo pear install phpunit/PHPUnit
 
