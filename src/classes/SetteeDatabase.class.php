@@ -255,15 +255,14 @@ class SetteeDatabase {
     $id = "_design/" . urlencode($design_doc);
     $view_name = urlencode($view_name);
     $id .= "/_view/$view_name";
-
     $data = array();
     if (!empty($key)) {
-      if (is_string($key)) {
-        $data = "key=" . '"' . $key . '"';
+      if (!is_array($key)) {
+        $data = "key=" . $key;
       }
-      elseif (is_array($key)) {
+      else {
         list($startkey, $endkey) = $key;
-        $data = "startkey=" . '"' . $startkey . '"&' . "endkey=" . '"' . $endkey . '"';
+        $data = "startkey=" . $startkey . '&' . "endkey=" . $endkey;
       }
 
       if ($descending) {
