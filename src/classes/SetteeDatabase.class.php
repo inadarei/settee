@@ -98,8 +98,11 @@ class SetteeDatabase {
     }
     
     $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
-    $document_json = json_encode($document, JSON_NUMERIC_CHECK);
-    
+    if(version_compare(PHP_VERSION, '5.3.3') >= 0) {
+        $document_json = json_encode($document, JSON_NUMERIC_CHECK);
+    } else {
+        $document_json = json_encode($document);
+    }
     $ret = $this->rest_client->http_put($full_uri, $document_json);
 
     $document->_id = $ret['decoded']->id;
