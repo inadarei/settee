@@ -304,5 +304,71 @@ class SetteeDatabase {
   function get_name() {
     return $this->dbname;
   }
+  
+  /**
+   * Return SetteeRestClient
+   *
+   * @return SetteeRestClient
+   */
+  public function get_rest_client()
+  {
+      return $this->rest_client;
+  }
 
+  /**
+   * Extended view quering. This function can:
+   * * pass extra parameter to view like include_docs(@param: $view_params),
+   * * fetch collection from view based on keys array,
+   * * fetch collection from _all_docs based on keys array
+   * 
+   * If $start_key is passed as array of parameters POST request
+   * will occur with body: array("keys" => YOUR_ARRAY). In addition
+   * if $design_doc is FALSE query to _all_docs will be done.
+   *
+   * @param mixed $design_doc
+   * @param mixed $view_name
+   * @param mixed $start_key
+   * @param mixed $end_key
+   * @param array $view_params
+   * @return object
+   */
+  public function get_view_extended($design_doc, $view_name = FALSE, $start_key = FALSE, $end_key = FALSE, array $view_params = array())
+  {
+    // prepare keys array as param
+    if(is_array($start_key)) {
+        if(!array_key_exists('keys', $start_key)) {
+            $start_key = array('keys' => $start_key);
+        }
+        
+        if(version_compare(PHP_VERSION, '5.3.3') >= 0) {
+            $data_json = json_encode($start_key, JSON_NUMERIC_CHECK);
+        } else {
+            $data_json = json_encode($start_key);
+        }
+        
+        $query_string = !empty($view_params) ? '?' . http_build_query($view_params) : '';
+        if($design_doc == FALSE) {
+            // case when we requesting _all_docs
+            $ret = $this->rest_client->http_request('POST',
+                $this->dbname . '/_all_docs' . $query_string, $data_json);
+        } else {
+            $ret = $this->rest_client->http_request('POST', 
+                    $this->dbname . '/_design/' . $design_doc .'/_view/' . $view_name . $query_string, 
+                    $data_json);
+        }
+    } else {
+        if($start_key && !$end_key) {
+            $view_params['key'] = $start_key;
+        } else if($start_key && $end_key) {
+            $view_params['startkey'] = $start_key;
+            $view_params['endkey'] = $end_key;
+        }
+        
+        $query_string = !empty($view_params) ? '?' . http_build_query($view_params) : '';
+        $full_uri = $this->dbname . "/" .  $this->safe_urlencode('_design/' . $design_doc . '/_view/' . $view_name) . $query_string;
+        $ret = $this->rest_client->http_request('GET', $full_uri);
+    }
+
+    return $ret['decoded'];
+  }
 }
