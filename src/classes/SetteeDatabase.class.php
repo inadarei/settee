@@ -334,6 +334,10 @@ class SetteeDatabase {
    */
   public function get_view_extended($design_doc, $view_name = FALSE, $start_key = FALSE, $end_key = FALSE, array $view_params = array())
   {
+    // encode view parameters
+    foreach($view_params as $key => &$val) {
+        $val = json_encode($val);
+    }
     // prepare keys array as param
     if(is_array($start_key)) {
         if(!array_key_exists('keys', $start_key)) {
@@ -346,7 +350,7 @@ class SetteeDatabase {
             $data_json = json_encode($start_key);
         }
         
-        $query_string = !empty($view_params) ? '?' . http_build_query($view_params) : '';
+        $query_string = !empty($view_params) ? '?' . urldecode(http_build_query($view_params)) : '';
         if($design_doc == FALSE) {
             // case when we requesting _all_docs
             $ret = $this->rest_client->http_request('POST',
@@ -358,13 +362,13 @@ class SetteeDatabase {
         }
     } else {
         if($start_key && !$end_key) {
-            $view_params['key'] = $start_key;
+            $view_params['key'] = json_encode($start_key);
         } else if($start_key && $end_key) {
-            $view_params['startkey'] = $start_key;
-            $view_params['endkey'] = $end_key;
+            $view_params['startkey'] = json_encode($start_key);
+            $view_params['endkey'] = json_encode($end_key);
         }
         
-        $query_string = !empty($view_params) ? '?' . http_build_query($view_params) : '';
+        $query_string = !empty($view_params) ? '?' . urldecode(http_build_query($view_params)) : '';
         $full_uri = $this->dbname . "/" .  $this->safe_urlencode('_design/' . $design_doc . '/_view/' . $view_name) . $query_string;
         $ret = $this->rest_client->http_request('GET', $full_uri);
     }
