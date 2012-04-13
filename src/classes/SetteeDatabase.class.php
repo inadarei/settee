@@ -332,14 +332,15 @@ class SetteeDatabase {
    * @param array $view_params
    * @return object
    */
-  public function get_view_extended($design_doc, $view_name = FALSE, $start_key = FALSE, $end_key = FALSE, array $view_params = array())
+  public function get_view_extended($design_doc, $view_name = FALSE, $start_key = FALSE, $end_key = FALSE
+          , array $view_params = array(), $suppressPost = FALSE)
   {
     // encode view parameters
     foreach($view_params as $key => &$val) {
         $val = json_encode($val);
     }
     // prepare keys array as param
-    if(is_array($start_key)) {
+    if(is_array($start_key) && !$suppressPost) {
         if(!array_key_exists('keys', $start_key)) {
             $start_key = array('keys' => $start_key);
         }
