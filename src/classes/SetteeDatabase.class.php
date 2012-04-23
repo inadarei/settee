@@ -98,8 +98,11 @@ class SetteeDatabase {
     }
     
     $full_uri = $this->dbname . "/" . $this->safe_urlencode($id);
-    $document_json = json_encode($document, JSON_NUMERIC_CHECK);
-    
+    if(version_compare(PHP_VERSION, '5.3.3') >= 0) {
+        $document_json = json_encode($document, JSON_NUMERIC_CHECK);
+    } else {
+        $document_json = json_encode($document);
+    }
     $ret = $this->rest_client->http_put($full_uri, $document_json);
 
     $document->_id = $ret['decoded']->id;
@@ -255,15 +258,14 @@ class SetteeDatabase {
     $id = "_design/" . urlencode($design_doc);
     $view_name = urlencode($view_name);
     $id .= "/_view/$view_name";
-
     $data = array();
     if (!empty($key)) {
-      if (is_string($key)) {
-        $data = "key=" . '"' . $key . '"';
+      if (!is_array($key)) {
+        $data = "key=" . $key;
       }
-      elseif (is_array($key)) {
+      else {
         list($startkey, $endkey) = $key;
-        $data = "startkey=" . '"' . $startkey . '"&' . "endkey=" . '"' . $endkey . '"';
+        $data = "startkey=" . $startkey . '&' . "endkey=" . $endkey;
       }
 
       if ($descending) {
@@ -302,5 +304,106 @@ class SetteeDatabase {
   function get_name() {
     return $this->dbname;
   }
+  
+  /**
+   * Return SetteeRestClient
+   *
+   * @return SetteeRestClient
+   */
+  public function get_rest_client()
+  {
+      return $this->rest_client;
+  }
 
+  /**
+   * Extended view quering. This function can:
+   * * pass extra parameter to view like include_docs(@param: $view_params),
+   * * fetch collection from view based on keys array,
+   * * fetch collection from _all_docs based on keys array
+   * 
+   * If $start_key is passed as array of parameters POST request
+   * will occur with body: array("keys" => YOUR_ARRAY). In addition
+   * if $design_doc is FALSE query to _all_docs will be done.
+   *
+   * @param mixed $design_doc
+   * @param mixed $view_name
+   * @param mixed $start_key
+   * @param mixed $end_key
+   * @param array $view_params
+   * @return object
+   */
+  public function get_view_extended($design_doc, $view_name = FALSE, $start_key = FALSE, $end_key = FALSE
+          , array $view_params = array(), $suppressPost = FALSE)
+  {
+    // encode view parameters
+    foreach($view_params as $key => &$val) {
+        $val = json_encode($val);
+    }
+    // prepare keys array as param
+    if(is_array($start_key) && !$suppressPost) {
+        if(!array_key_exists('keys', $start_key)) {
+            $start_key = array('keys' => $start_key);
+        }
+        
+        if(version_compare(PHP_VERSION, '5.3.3') >= 0) {
+            $data_json = json_encode($start_key, JSON_NUMERIC_CHECK);
+        } else {
+            $data_json = json_encode($start_key);
+        }
+        
+        $query_string = !empty($view_params) ? '?' . urldecode(http_build_query($view_params)) : '';
+        if($design_doc == FALSE) {
+            // case when we requesting _all_docs
+            $ret = $this->rest_client->http_request('POST',
+                $this->dbname . '/_all_docs' . $query_string, $data_json);
+        } else {
+            $ret = $this->rest_client->http_request('POST', 
+                    $this->dbname . '/_design/' . $design_doc .'/_view/' . $view_name . $query_string, 
+                    $data_json);
+        }
+    } else {
+        if($start_key && !$end_key) {
+            $view_params['key'] = json_encode($start_key);
+        } else if($start_key && $end_key) {
+            $view_params['startkey'] = json_encode($start_key);
+            $view_params['endkey'] = json_encode($end_key);
+        }
+        
+        $query_string = !empty($view_params) ? '?' . urldecode(http_build_query($view_params)) : '';
+        $full_uri = $this->dbname . "/" .  $this->safe_urlencode('_design/' . $design_doc . '/_view/' . $view_name) . $query_string;
+        $ret = $this->rest_client->http_request('GET', $full_uri);
+    }
+
+    return $ret['decoded'];
+  }
+  
+  /**
+   * Modify multiple documents with single request.
+   * 
+   * As an param this function takes an array of documents
+   * in specyfic format(@see CouchDB docs - http://wiki.apache.org/couchdb/HTTP_Bulk_Document_API).
+   * If no docs key is specified this function 
+   * will add it to keep consistency with CouchDB.
+   *
+   * @param array $docs
+   * @return array
+   */
+  public function bulk_update(array $docs)
+  {
+      if(!array_key_exists('docs', $docs)) {
+          if(array_key_exists('all_or_nothing', $docs)) {
+              $docs = array(
+                  'all_or_nothing' => $docs['all_or_nothing'],
+                  'docs' => $docs
+              );
+              unset($docs['docs']['all_or_nothing']);
+          }
+          $docs = array('docs' => $docs);
+      }
+      
+      $full_uri = $this->dbname . "/_bulk_docs";
+      $ret = $this->rest_client->http_request('POST', $full_uri, json_encode($docs));
+      
+      return $ret['decoded'];
+  }
 }

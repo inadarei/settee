@@ -148,11 +148,15 @@ class SetteeRestClient {
    * @return
    *  an array containing json and decoded versions of the response.
    */
-  private function http_request($http_method, $uri, $data = array()) {
+  public function http_request($http_method, $uri, $data = array()) {
     $data = (is_array($data)) ? http_build_query($data) : $data;
 
     if (!empty($data)) {
-      curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Content-Length: ' . strlen($data)));
+      // header Content-Length is optional
+      curl_setopt($this->curl, CURLOPT_HTTPHEADER, array(
+          'Content-Type:application/json',
+          'Content-Length:' . strlen($data)
+          ));
       curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
     }
 
