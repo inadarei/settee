@@ -376,4 +376,34 @@ class SetteeDatabase {
 
     return $ret['decoded'];
   }
+  
+  /**
+   * Modify multiple documents with single request.
+   * 
+   * As an param this function takes an array of documents
+   * in specyfic format(@see CouchDB docs - http://wiki.apache.org/couchdb/HTTP_Bulk_Document_API).
+   * If no docs key is specified this function 
+   * will add it to keep consistency with CouchDB.
+   *
+   * @param array $docs
+   * @return array
+   */
+  public function bulk_update(array $docs)
+  {
+      if(!array_key_exists('docs', $docs)) {
+          if(array_key_exists('all_or_nothing', $docs)) {
+              $docs = array(
+                  'all_or_nothing' => $docs['all_or_nothing'],
+                  'docs' => $docs
+              );
+              unset($docs['docs']['all_or_nothing']);
+          }
+          $docs = array('docs' => $docs);
+      }
+      
+      $full_uri = $this->dbname . "/_bulk_docs";
+      $ret = $this->rest_client->http_request('POST', $full_uri, json_encode($docs));
+      
+      return $ret['decoded'];
+  }
 }
